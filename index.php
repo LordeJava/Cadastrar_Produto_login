@@ -1,14 +1,19 @@
+<?php require 'includes/protege.php'; ?>
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Formulario de Cadastro</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/estilo.css">
 </head>
 <body>
+    <?php include 'includes/navbar.php'; ?>
+
     <section>
-        <a href="produtos.php" class="sombra">Ver todos os produtos</a>
         <form method="post" enctype="multipart/form-data">
-            <h1>ENVIO DE IMAGENS</h1>
+            <h1>CADASTRO DE PRODUTO</h1>
             <label for="nome">Nome do Produto</label>
             <input type="text" name="nome" id="nome" class="sombra">
 

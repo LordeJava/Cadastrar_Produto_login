@@ -1,4 +1,4 @@
-CREATE DATABASE loja_etim;
+CREATE DATABASE IF NOT EXISTS loja_etim CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE loja_etim;
 
 CREATE TABLE produtos(
@@ -14,3 +14,15 @@ CREATE TABLE imagens(
     fk_id_produto int,
     FOREIGN KEY(fk_id_produto) REFERENCES produtos(id_produto)
 );
+
+CREATE TABLE usuarios(
+    id_usuario int AUTO_INCREMENT PRIMARY KEY,
+    nome varchar(100) NOT NULL,
+    email varchar(100) NOT NULL UNIQUE,
+    senha varchar(255) NOT NULL
+);
+
+-- usuario inicial: e-mail admin@admin.com / senha: password
+-- (troque a senha depois em Usuarios > Atualizar)
+INSERT INTO usuarios (nome, email, senha) VALUES
+('Administrador', 'admin@admin.com', '123456');

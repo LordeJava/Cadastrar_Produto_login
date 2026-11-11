@@ -91,4 +91,48 @@ class Produto{
 
         return $produtos;
     }
+
+    //APAGAR produto: primeiro as imagens (banco e arquivos), depois o produto
+    public function apagarProduto($id){
+
+        $this->conecta();
+
+        //pega o nome dos arquivos de imagem do produto
+        $sql = "SELECT nome_imagem FROM imagens WHERE fk_id_produto = :id";
+        $sql = $this->pdo->prepare($sql);
+        $sql->bindValue(":id", $id);
+        $sql->execute();
+        $arquivos = $sql->fetchAll(PDO::FETCH_COLUMN);
+
+        try {
+            $this->pdo->beginTransaction();
+
+            //apaga as imagens do banco (precisa ser antes por causa da chave estrangeira)
+            $sql = "DELETE FROM imagens WHERE fk_id_produto = :id";
+            $sql = $this->pdo->prepare($sql);
+            $sql->bindValue(":id", $id);
+            $sql->execute();
+
+            //apaga o produto
+            $sql = "DELETE FROM produtos WHERE id_produto = :id";
+            $sql = $this->pdo->prepare($sql);
+            $sql->bindValue(":id", $id);
+            $sql->execute();
+
+            $this->pdo->commit();
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            return false;
+        }
+
+        //apaga os arquivos da pasta imagens
+        foreach($arquivos as $arquivo){
+            $caminho = __DIR__ . '/../imagens/' . basename($arquivo);
+            if(is_file($caminho)){
+                unlink($caminho);
+            }
+        }
+
+        return true;
+    }
 }
