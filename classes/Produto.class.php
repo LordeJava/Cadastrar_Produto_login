@@ -135,4 +135,94 @@ class Produto{
 
         return true;
     }
+
+    //BUSCAR um produto com suas imagens (retorna array ou false)
+    public function buscarProduto($id){
+
+        $this->conecta();
+
+        $sql = "SELECT id_produto, nome_produto, descricao, valor FROM produtos WHERE id_produto = :id";
+        $sql = $this->pdo->prepare($sql);
+        $sql->bindValue(":id", $id);
+        $sql->execute();
+
+        $produto = $sql->fetch(PDO::FETCH_ASSOC);
+
+        if(!$produto){
+            return false;
+        }
+
+        $sql = "SELECT id_imagem, nome_imagem FROM imagens WHERE fk_id_produto = :id ORDER BY id_imagem";
+        $sql = $this->pdo->prepare($sql);
+        $sql->bindValue(":id", $id);
+        $sql->execute();
+
+        $produto['imagens'] = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+        return $produto;
+    }
+
+    //ALTERAR produto: dados, remover imagens marcadas e adicionar fotos novas
+    public function alterarProduto($id, $nome, $descricao, $valor, $fotosNovas = array(), $removerIds = array()){
+
+        $this->conecta();
+
+        $arquivosApagar = array();
+
+        try {
+            $this->pdo->beginTransaction();
+
+            //atualiza os dados do produto
+            $sql = "UPDATE produtos SET nome_produto = :n, descricao = :d, valor = :v WHERE id_produto = :id";
+            $sql = $this->pdo->prepare($sql);
+            $sql->bindValue(":n", $nome);
+            $sql->bindValue(":d", $descricao);
+            $sql->bindValue(":v", $valor);
+            $sql->bindValue(":id", $id);
+            $sql->execute();
+
+            //remove as imagens marcadas (so se pertencerem a este produto)
+            foreach($removerIds as $id_imagem){
+                $sql = "SELECT nome_imagem FROM imagens WHERE id_imagem = :i AND fk_id_produto = :p";
+                $sql = $this->pdo->prepare($sql);
+                $sql->bindValue(":i", $id_imagem);
+                $sql->bindValue(":p", $id);
+                $sql->execute();
+                $nome_arquivo = $sql->fetchColumn();
+
+                if($nome_arquivo){
+                    $sql = "DELETE FROM imagens WHERE id_imagem = :i";
+                    $sql = $this->pdo->prepare($sql);
+                    $sql->bindValue(":i", $id_imagem);
+                    $sql->execute();
+
+                    $arquivosApagar[] = $nome_arquivo;
+                }
+            }
+
+            //adiciona as fotos novas
+            foreach($fotosNovas as $nome_foto){
+                $sql = "INSERT INTO imagens (nome_imagem, fk_id_produto) VALUES (:n, :fk)";
+                $sql = $this->pdo->prepare($sql);
+                $sql->bindValue(":n", $nome_foto);
+                $sql->bindValue(":fk", $id);
+                $sql->execute();
+            }
+
+            $this->pdo->commit();
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            return false;
+        }
+
+        //apaga da pasta imagens os arquivos das fotos removidas
+        foreach($arquivosApagar as $arquivo){
+            $caminho = __DIR__ . '/../imagens/' . basename($arquivo);
+            if(is_file($caminho)){
+                unlink($caminho);
+            }
+        }
+
+        return true;
+    }
 }

@@ -62,9 +62,13 @@ $produtos = $p->listarProdutos();
                         <p class="produto-desc"><?php echo nl2br(htmlspecialchars($produto['descricao'])); ?></p>
                         <p class="produto-preco">R$ <?php echo number_format($produto['valor'], 2, ',', '.'); ?></p>
 
-                        <form method="post" style="width:auto; margin:10px 0 0; padding:0;" onsubmit="return confirm('Excluir este produto e as imagens dele?');">
-                            <button type="submit" name="apagar_id" value="<?php echo $produto['id_produto']; ?>" class="btn btn-danger btn-sm w-100">Excluir</button>
-                        </form>
+                        <div class="d-grid gap-2 mt-2">
+                            <a class="btn btn-primary btn-sm" href="produtos_editar.php?id=<?php echo $produto['id_produto']; ?>">Editar</a>
+
+                            <form method="post" style="width:auto; margin:0; padding:0;" onsubmit="return confirm('Excluir este produto e as imagens dele?');">
+                                <button type="submit" name="apagar_id" value="<?php echo $produto['id_produto']; ?>" class="btn btn-danger btn-sm" style="box-sizing:border-box; width:100%;">Excluir</button>
+                            </form>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             </div>

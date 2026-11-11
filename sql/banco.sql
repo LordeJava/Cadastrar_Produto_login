@@ -1,4 +1,5 @@
-CREATE DATABASE IF NOT EXISTS loja_etim CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+DROP DATABASE IF EXISTS loja_etim;
+CREATE DATABASE loja_etim CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE loja_etim;
 
 CREATE TABLE produtos(
@@ -22,7 +23,6 @@ CREATE TABLE usuarios(
     senha varchar(255) NOT NULL
 );
 
--- usuario inicial: e-mail admin@admin.com / senha: password
--- (troque a senha depois em Usuarios > Atualizar)
+-- usuario inicial: e-mail admin@admin.com / senha: 123456
 INSERT INTO usuarios (nome, email, senha) VALUES
-('Administrador', 'admin@admin.com', '123456');
+('Administrador', 'admin@admin.com', '$2b$12$JjJZ/6dcbfdjXq1mezasI.laCsgd/AR2TzG./xeshlq88wlCU5H7e');
